@@ -2,7 +2,7 @@
 
 ## Overview
 
-**TPC App** is a user-friendly inventory and payroll management system with a modern Python Tkinter GUI. It helps small businesses track ice cream and gelato flavors, place and review vendor orders, and manage employee payroll in a centralized, efficient way.
+This app is a user-friendly inventory and payroll management system with a modern Python Tkinter GUI. It helps a small business place and review  orders from various vendors, track specific items from vendors, and manage employee payroll in a centralized, efficient way.
 
 ---
 
@@ -11,17 +11,17 @@
 ### Inventory Management
 - **Manage Flavors:**  
   - Add, edit, and delete flavors for three vendors: Warwick, Crescent Ridge, and Cold Fusion.
-  - Seasonal tagging: Label flavors as year-round, winter, or summer, and filter accordingly.
+  - Seasonal tagging: Label flavors as year-round, winter, or summer, and filter accordingly to ensure orders are as efficient as possible.
 
 - **Place Orders:**  
   - Quickly place new orders by vendor, with an easy-to-use, centered order entry form.
-  - Automatic calculation of total order cost.
-  - Smart filtering for seasonal flavors.
+  - Automatic calculation of total order cost (tax included).
+  - Smart filtering for seasonal flavors to avoid item redundancy.
 
 - **Review Orders:**  
-  - Browse historical orders, grouped by vendor.
+  - Browse prior orders, grouped by vendor.
   - View order details, including itemized breakdown and total price.
-  - Delete orders with a single click.
+  - Delete orders when needed.
 
 ### Payroll Management
 - **Employee Records:**  
@@ -30,7 +30,17 @@
   - Automatically calculates payroll for each period.
 
 ---
+## Future Additions
 
+### Automated C++ Scheduling Program
+- Allow user to generate weekly schedule for all employees using algorithm which considers every employee's
+  - preferred shift times
+  - number of desired shifts per week
+  - priority in shift consideration
+  - strength
+  - ability to open and close the business
+  - willingness/ability to work doubles
+  
 ## Getting Started
 
 ### Prerequisites
