@@ -31,7 +31,6 @@ class DatabaseManager:
             unit_price REAL
         )""")
 
-        # Add 'season' column if missing
         try:
             self.cur.execute("ALTER TABLE WarwickFlavors ADD COLUMN season TEXT DEFAULT 'year_round'")
         except sqlite3.OperationalError:
@@ -67,8 +66,28 @@ class DatabaseManager:
             employee_id INTEGER PRIMARY KEY,
             f_name TEXT NOT NULL,
             l_name TEXT NOT NULL,
-            wage REAL NOT NULL
+            wage REAL NOT NULL,
+            shift_priority INTEGER DEFAULT 3,
+            strength INTEGER DEFAULT 5,
+            desired_weekly_shifts INTEGER NOT NULL,
+            is_senior INTEGER DEFAULT 0,
+            double_eligible INTEGER DEFAULT 0, 
+            preferred_shift TEXT DEFAULT 'day'
         )""")
+        try: self.cur.execute("ALTER TABLE Employee ADD COLUMN shift_priority INTEGER DEFAULT 3")
+        except sqlite3.OperationalError: pass
+        try: self.cur.execute("ALTER TABLE Employee ADD COLUMN strength INTEGER DEFAULT 5")
+        except sqlite3.OperationalError: pass
+        try: self.cur.execute("ALTER TABLE Employee ADD COLUMN desired_weekly_shifts INTEGER DEFAULT 5")
+        except sqlite3.OperationalError: pass
+        try: self.cur.execute("ALTER TABLE Employee ADD COLUMN is_senior INTEGER DEFAULT 0")
+        except sqlite3.OperationalError: pass
+        try: self.cur.execute("ALTER TABLE Employee ADD COLUMN double_eligible INTEGER DEFAULT 0")
+        except sqlite3.OperationalError: pass
+        try: self.cur.execute("ALTER TABLE Employee ADD COLUMN preferred_shift TEXT DEFAULT 'day'")
+        except sqlite3.OperationalError: pass
+
+        
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS PayPeriods (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
