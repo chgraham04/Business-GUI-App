@@ -61,30 +61,31 @@ class OrderManager:
 
         scrollable_frame = create_scrollable_frame(self.window, self.bg_color)
 
-        # Use pack everywhere for children of scrollable_frame
-        # Outer centering frame (fills horizontal space)
+        # --- This is the centering trick! ---
         center_outer = tk.Frame(scrollable_frame, bg=self.bg_color)
-        center_outer.pack(fill='both', expand=True)
+        center_outer.pack(expand=True)
 
-        # Form center (where grid will be used for fields)
         form_center = tk.Frame(center_outer, bg=self.bg_color)
-        form_center.pack(anchor='center', pady=20)
+        form_center.pack(anchor='center')
 
         row_idx = 0
 
         # Title
-        tk.Label(form_center, text=f"{vendor_name} Order", font=('Georgia', 20), bg=self.bg_color).grid(row=row_idx, column=0, columnspan=2, pady=10)
+        tk.Label(form_center, text=f"{vendor_name} Order", font=('Georgia', 20), bg=self.bg_color)\
+            .grid(row=row_idx, column=0, columnspan=2, pady=10)
         row_idx += 1
 
-        # Seasonal filter checkboxes (spanning two columns for centering)
+        # Seasonal filter checkboxes
         include_winter = tk.BooleanVar(value=True)
         include_summer = tk.BooleanVar(value=True)
 
         filter_frame = tk.Frame(form_center, bg=self.bg_color)
         filter_frame.grid(row=row_idx, column=0, columnspan=2, pady=(5, 10))
 
-        tk.Checkbutton(filter_frame, text="Include Winter Flavors", variable=include_winter, bg=self.bg_color).pack(side="left", padx=10)
-        tk.Checkbutton(filter_frame, text="Include Summer Flavors", variable=include_summer, bg=self.bg_color).pack(side="left", padx=10)
+        tk.Checkbutton(filter_frame, text="Include Winter Flavors", variable=include_winter, bg=self.bg_color)\
+            .pack(side="left", padx=10)
+        tk.Checkbutton(filter_frame, text="Include Summer Flavors", variable=include_summer, bg=self.bg_color)\
+            .pack(side="left", padx=10)
         row_idx += 1
 
         all_flavors = self.db.fetch(SQL["get_flavors_sorted"].format(table=table_name))
@@ -108,59 +109,54 @@ class OrderManager:
                 entry_widgets[fid] = entry
                 r += 1
 
+            # --- Date field and buttons always come after all flavors ---
+            tk.Label(form_center, text="Enter Order Date (MM-DD-YYYY):", font=('Georgia', 14), bg=self.bg_color)\
+                .grid(row=r, column=0, pady=(20, 5), sticky='e', columnspan=1)
+            date_entry = tk.Entry(form_center, font=('Georgia', 12), justify='center')
+            date_entry.grid(row=r, column=1, pady=(20, 5), sticky='w')
+            date_entry.insert(0, datetime.today().strftime('%m-%d-%Y'))
+            r += 1
+
+            err_label = tk.Label(form_center, text="", font=('Georgia', 10), fg="red", bg=self.bg_color)
+            err_label.grid(row=r, column=0, columnspan=2)
+            r += 1
+
+            def finalize_order():
+                date_str = date_entry.get().strip()
+                if not is_valid_date(date_str):
+                    err_label.config(text="Invalid date format. Use MM-DD-YYYY.")
+                    return
+
+                try:
+                    self.db.execute(SQL["insert_order"], (date_str, vendor_name, 0.0))
+                    order_id = self.db.cur.lastrowid
+
+                    total_price = 0.0
+                    for fid, entry in entry_widgets.items():
+                        qty_str = entry.get().strip()
+                        try:
+                            qty = int(qty_str) if qty_str else 0
+                            if qty > 0:
+                                unit_price = self.db.fetch(SQL["get_unit_price"].format(table=table_name), (fid,))[0][0]
+                                total_price += unit_price * qty
+                                self.db.execute(SQL["insert_order_detail"], (order_id, fid, qty))
+                        except ValueError:
+                            continue
+
+                    self.db.execute(SQL["update_order_total"], (total_price, order_id))
+
+                except Exception as e:
+                    messagebox.showerror("Database Error", str(e))
+                    return
+
+                self.back_callback()
+
+            tk.Button(form_center, text="Place Order", font=('Georgia', 14), command=finalize_order)\
+                .grid(row=r, column=0, columnspan=2, pady=20)
+
         render_flavors()
         include_winter.trace_add("write", lambda *a: render_flavors())
         include_summer.trace_add("write", lambda *a: render_flavors())
-
-        # Date entry (below grid, centered)
-        r = row_idx + len([f for f in all_flavors if (f[3] != "winter" or include_winter.get()) and (f[3] != "summer" or include_summer.get())])
-        tk.Label(form_center, text="Enter Order Date (MM-DD-YYYY):", font=('Georgia', 14), bg=self.bg_color)\
-            .grid(row=r, column=0, pady=(20, 5), sticky='e', columnspan=1)
-        date_entry = tk.Entry(form_center, font=('Georgia', 12), justify='center')
-        date_entry.grid(row=r, column=1, pady=(20, 5), sticky='w')
-        date_entry.insert(0, datetime.today().strftime('%m-%d-%Y'))
-        r += 1
-
-        err_label = tk.Label(form_center, text="", font=('Georgia', 10), fg="red", bg=self.bg_color)
-        err_label.grid(row=r, column=0, columnspan=2)
-        r += 1
-
-        def finalize_order():
-            date_str = date_entry.get().strip()
-            if not is_valid_date(date_str):
-                err_label.config(text="Invalid date format. Use MM-DD-YYYY.")
-                return
-
-            try:
-                self.db.execute(SQL["insert_order"], (date_str, vendor_name, 0.0))
-                order_id = self.db.cur.lastrowid
-
-                total_price = 0.0
-                for fid, entry in entry_widgets.items():
-                    qty_str = entry.get().strip()
-                    try:
-                        qty = int(qty_str) if qty_str else 0
-                        if qty > 0:
-                            unit_price = self.db.fetch(SQL["get_unit_price"].format(table=table_name), (fid,))[0][0]
-                            total_price += unit_price * qty
-                            self.db.execute(SQL["insert_order_detail"], (order_id, fid, qty))
-                    except ValueError:
-                        continue
-
-                self.db.execute(SQL["update_order_total"], (total_price, order_id))
-
-            except Exception as e:
-                messagebox.showerror("Database Error", str(e))
-                return
-
-            self.back_callback()
-
-        tk.Button(form_center, text="Place Order", font=('Georgia', 14), command=finalize_order)\
-            .grid(row=r, column=0, columnspan=2, pady=20)
-        r += 1
-
-        tk.Button(form_center, text="Back to Menu", font=('Georgia', 12), command=self.back_callback)\
-            .grid(row=r, column=0, columnspan=2, pady=5)
 
     def review_orders(self):
         self.clear_window()
