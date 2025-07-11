@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 from database import DatabaseManager
 from order_manager import OrderManager
 from flavor_manager import FlavorManager
-# from payroll_manager import PayrollManager  # Uncomment if/when ready
+from payroll_manager import PayrollManager  # Make sure this is imported!
 
 class TPCApp:
     def __init__(self):
@@ -13,18 +13,14 @@ class TPCApp:
         self.bg_color = "#a3b18a"
         self.window.configure(bg=self.bg_color)
 
-        self.db = DatabaseManager()
+        # View stack for back arrow navigation
         self.view_stack = []
 
-        self.order_manager = OrderManager(
-            self.window, self.db, self.show_main_menu, self.view_stack, self.bg_color
-        )
-        self.flavor_manager = FlavorManager(
-            self.window, self.db, self.show_main_menu, self.view_stack, self.bg_color
-        )
-        # self.payroll_manager = PayrollManager(
-        #     self.window, self.db, self.show_main_menu, self.view_stack, self.bg_color
-        # )
+        # Initialize database and managers, passing the view_stack to each
+        self.db = DatabaseManager()
+        self.order_manager = OrderManager(self.window, self.db, self.show_main_menu, self.view_stack, self.bg_color)
+        self.flavor_manager = FlavorManager(self.window, self.db, self.show_main_menu, self.view_stack, self.bg_color)
+        self.payroll_manager = PayrollManager(self.window, self.db, self.show_main_menu, self.view_stack, self.bg_color)
 
         self.setup_styles()
         self.show_main_menu()
@@ -49,14 +45,19 @@ class TPCApp:
 
         ttk.Button(
             inventory_menu, text='Place Order',
-            command=self.order_manager.place_order,
+            command=lambda: [self.view_stack.append(self.show_main_menu), self.order_manager.place_order()],
             style='TPC_button.TButton'
         ).pack(side=tk.LEFT, padx=10)
-        ttk.Button(inventory_menu, text='Review Old Orders', command=self.order_manager.review_orders, style='TPC_button.TButton').pack(side=tk.LEFT, padx=10)
+
+        ttk.Button(
+            inventory_menu, text='Review Old Orders',
+            command=lambda: [self.view_stack.append(self.show_main_menu), self.order_manager.review_orders()],
+            style='TPC_button.TButton'
+        ).pack(side=tk.LEFT, padx=10)
 
         ttk.Button(
             inventory_menu, text='Manage Flavors',
-            command=self.flavor_manager.manage_flavors_menu,
+            command=lambda: [self.view_stack.append(self.show_main_menu), self.flavor_manager.manage_flavors_menu()],
             style='TPC_button.TButton'
         ).pack(side=tk.LEFT, padx=10)
 
@@ -68,18 +69,24 @@ class TPCApp:
             payroll_menu, text='Pay Employees',
             command=self.placeholder, style='TPC_button.TButton'
         ).pack(side=tk.LEFT, padx=10)
+
         ttk.Button(
             payroll_menu, text='Browse Pay Periods',
             command=self.placeholder, style='TPC_button.TButton'
         ).pack(side=tk.LEFT, padx=10)
+
+        # Here is the functional Add Employee button!
         ttk.Button(
             payroll_menu, text='Add Employee',
-            command=self.placeholder, style='TPC_button.TButton'
+            command=lambda: [self.view_stack.append(self.show_main_menu), self.payroll_manager.add_employee()],
+            style='TPC_button.TButton'
         ).pack(side=tk.LEFT, padx=10)
+
         ttk.Button(
             payroll_menu, text='View Employee List',
             command=self.placeholder, style='TPC_button.TButton'
         ).pack(side=tk.LEFT, padx=10)
+
         ttk.Button(
             payroll_menu, text='Edit Employee Info',
             command=self.placeholder, style='TPC_button.TButton'

@@ -48,10 +48,13 @@ def create_nav_buttons(window, back_callback, menu_callback):
 SQL = {
     # Orders
     "insert_order": "INSERT INTO Orders (date, vendor, total) VALUES (?, ?, ?)",
+    
     "insert_order_detail": "INSERT INTO OrderDetails (order_id, flavor_id, quantity) VALUES (?, ?, ?)",
+
     "update_order_total": "UPDATE Orders SET total = ? WHERE order_id = ?",
     "get_unit_price": "SELECT unit_price FROM {table} WHERE flavor_id = ?",
     "get_orders_by_vendor": "SELECT order_id, date, total FROM Orders WHERE vendor = ? ORDER BY date DESC",
+
     "get_order_flavors": """
         SELECT od.flavor_id, f.name, od.quantity, f.unit_price
         FROM OrderDetails od
@@ -59,29 +62,40 @@ SQL = {
         WHERE od.order_id = ?
         ORDER BY f.name ASC
     """,
+
     "get_order_total_quantity": """
         SELECT SUM(quantity) FROM OrderDetails WHERE order_id = ?
     """,
+
     "delete_order_details": "DELETE FROM OrderDetails WHERE order_id = ?",
     "delete_order": "DELETE FROM Orders WHERE order_id = ?",
 
     # Flavors
     "get_flavors": "SELECT flavor_id, name, unit_price, season FROM {table}",
     "get_flavors_sorted": "SELECT flavor_id, name, unit_price, season FROM {table} ORDER BY name ASC",
+
     "flavor_exists": "SELECT 1 FROM {table} WHERE flavor_id = ?",
     "add_flavor": "INSERT INTO {table} (flavor_id, name, type, unit_price, season) VALUES (?, ?, ?, ?, ?)",
+
     "delete_flavor": "DELETE FROM {table} WHERE flavor_id = ?",
     "update_flavor": "UPDATE {table} SET name = ?, unit_price = ?, season = ? WHERE flavor_id = ?",
+
     "insert_flavor": "INSERT INTO {table} (flavor_id, name, type, unit_price, season) VALUES (?, ?, ?, ?, ?)",
 
     # Employees
     "get_all_employees": "SELECT employee_id, f_name, l_name, wage FROM Employee ORDER BY employee_id",
-    "insert_employee": "INSERT INTO Employee (f_name, l_name, wage) VALUES (?, ?, ?)",
+
+    "insert_employee": "INSERT INTO Employee "
+    "(f_name, l_name, wage, shift_priority, strength, desired_weekly_shifts, is_senior, double_eligible, preferred_shift) "
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+
     "update_employee": "UPDATE Employee SET f_name = ?, l_name = ?, wage = ? WHERE employee_id = ?",
 
     # Payroll
     "insert_payperiod": "INSERT INTO PayPeriods (employee_id, pay_period, hours_worked, overtime_hours, sick_hours) VALUES (?, ?, ?, ?, ?)",
+
     "update_summary": "INSERT OR REPLACE INTO PayrollSummary (pay_period, total_payout) VALUES (?, ?)",
+
     "get_summary": "SELECT pay_period, total_payout FROM PayrollSummary ORDER BY pay_period DESC"
 }
 
