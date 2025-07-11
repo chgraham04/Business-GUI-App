@@ -43,6 +43,8 @@ This app is a user-friendly inventory and payroll management system with a moder
   
 ## Getting Started
 
+- Program executed from tpc_app.py
+
 ### Prerequisites
 
 - Python 3.8 or higher
