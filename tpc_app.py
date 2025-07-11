@@ -83,14 +83,11 @@ class TPCApp:
         ).pack(side=tk.LEFT, padx=10)
 
         ttk.Button(
-            payroll_menu, text='View Employee List',
-            command=self.placeholder, style='TPC_button.TButton'
+            payroll_menu, text='Employee Info',
+            command=lambda: [self.view_stack.append(self.show_main_menu), self.payroll_manager.employee_info()],
+            style='TPC_button.TButton'
         ).pack(side=tk.LEFT, padx=10)
 
-        ttk.Button(
-            payroll_menu, text='Edit Employee Info',
-            command=self.placeholder, style='TPC_button.TButton'
-        ).pack(side=tk.LEFT, padx=10)
 
     def placeholder(self):
         messagebox.showinfo("Under Construction", "This feature is being refactored.")

@@ -46,9 +46,11 @@ def create_nav_buttons(window, back_callback, menu_callback):
 
 
 SQL = {
+
     # Orders
+
     "insert_order": "INSERT INTO Orders (date, vendor, total) VALUES (?, ?, ?)",
-    
+
     "insert_order_detail": "INSERT INTO OrderDetails (order_id, flavor_id, quantity) VALUES (?, ?, ?)",
 
     "update_order_total": "UPDATE Orders SET total = ? WHERE order_id = ?",
@@ -70,7 +72,9 @@ SQL = {
     "delete_order_details": "DELETE FROM OrderDetails WHERE order_id = ?",
     "delete_order": "DELETE FROM Orders WHERE order_id = ?",
 
+
     # Flavors
+
     "get_flavors": "SELECT flavor_id, name, unit_price, season FROM {table}",
     "get_flavors_sorted": "SELECT flavor_id, name, unit_price, season FROM {table} ORDER BY name ASC",
 
@@ -82,7 +86,9 @@ SQL = {
 
     "insert_flavor": "INSERT INTO {table} (flavor_id, name, type, unit_price, season) VALUES (?, ?, ?, ?, ?)",
 
+
     # Employees
+
     "get_all_employees": "SELECT employee_id, f_name, l_name, wage FROM Employee ORDER BY employee_id",
 
     "insert_employee": "INSERT INTO Employee "
@@ -91,7 +97,15 @@ SQL = {
 
     "update_employee": "UPDATE Employee SET f_name = ?, l_name = ?, wage = ? WHERE employee_id = ?",
 
+    "get_all_employees": "SELECT employee_id, f_name, l_name, wage, shift_priority, strength, desired_weekly_shifts, is_senior, double_eligible, preferred_shift FROM Employee ORDER BY employee_id",
+
+    "update_employee": "UPDATE Employee SET f_name=?, l_name=?, wage=?, shift_priority=?, strength=?, desired_weekly_shifts=?, is_senior=?, double_eligible=?, preferred_shift=? WHERE employee_id=?",
+
+    "delete_employee": "DELETE FROM Employee WHERE employee_id=?",
+
+
     # Payroll
+
     "insert_payperiod": "INSERT INTO PayPeriods (employee_id, pay_period, hours_worked, overtime_hours, sick_hours) VALUES (?, ?, ?, ?, ?)",
 
     "update_summary": "INSERT OR REPLACE INTO PayrollSummary (pay_period, total_payout) VALUES (?, ?)",
